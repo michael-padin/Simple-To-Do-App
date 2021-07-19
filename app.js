@@ -1,9 +1,8 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
-const PORT = 3000;
 const mongoose = require("mongoose");
-var _ = require('lodash');
+var _ = require("lodash");
 
 app.use(
   express.urlencoded({
@@ -103,17 +102,14 @@ app.post("/", function (req, res) {
   if (listName === "Today") {
     item.save();
     res.redirect("/");
-    
   } else {
-    Lists.findOne({name: listName}, (err, foundList)=>{
+    Lists.findOne({ name: listName }, (err, foundList) => {
       foundList.items.push(item);
       foundList.save();
       res.redirect("/" + listName);
-       });
+    });
   }
 });
-
-
 
 // Deleting item
 app.post("/delete", function (req, res) {
@@ -122,20 +118,22 @@ app.post("/delete", function (req, res) {
 
   if (listName === "Today") {
     Item.findByIdAndRemove(selectedItem, (err) => {
-      if (!err){
+      if (!err) {
         res.redirect("/");
       }
     });
   } else {
-    Lists.findOneAndUpdate({name: listName }, {$pull: {items: {_id: selectedItem}}}, (err, foundList)=>{
-      if(!err){
-        res.redirect("/" + listName)  ;
+    Lists.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: selectedItem } } },
+      (err, foundList) => {
+        if (!err) {
+          res.redirect("/" + listName);
+        }
       }
-    });
+    );
   }
 });
-
-
 
 // New Schema for list items
 const listsSchema = new mongoose.Schema({
@@ -146,10 +144,9 @@ const listsSchema = new mongoose.Schema({
 // Creating model for List items
 const Lists = mongoose.model("List", listsSchema);
 
-
 app.get("/:customListName", (req, res) => {
   const customListName = _.capitalize(req.params.customListName);
-  const list = new Lists({ name: customListName, items: defaultItems});
+  const list = new Lists({ name: customListName, items: defaultItems });
 
   Lists.findOne({ name: customListName }, (err, foundLists) => {
     if (!err) {
@@ -158,20 +155,23 @@ app.get("/:customListName", (req, res) => {
         list.save();
         res.redirect("/" + customListName);
       } else {
-        res.render("list", {listTitle: foundLists.name , newListItems: foundLists.items });
+        res.render("list", {
+          listTitle: foundLists.name,
+          newListItems: foundLists.items,
+        });
       }
     }
   });
 });
 
-
-
-
-
 app.get("/about", function (res, res) {
   res.render("about");
 });
 
-app.listen(PORT, function () {
-  console.log("Port is running at 3000");
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 3000;
+}
+app.listen(port, function () {
+  console.log("Server has started successfully");
 });
