@@ -1,7 +1,6 @@
 {
   "name": "todolist-v1.3",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
@@ -19,5 +18,6 @@
     "mongodb": "^3.6.9",
     "mongoose": "^5.13.2",
     "nodemon": "^2.0.9"
-  }
+  },
+  "description": ""
 }
