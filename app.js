@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-var _ = require("lodash");
+const _ = require("lodash");
 
 app.use(
   express.urlencoded({
