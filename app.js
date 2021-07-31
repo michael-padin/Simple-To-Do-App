@@ -1,8 +1,11 @@
 const bodyParser = require("body-parser");
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const _ = require("lodash");
+require("dotenv").config();
+const app = express();
+const Item = require("./models/models");
+const List = require("./models/models");
 
 app.use(
   express.urlencoded({
@@ -14,7 +17,7 @@ app.use(express.static("public"));
 
 // Connect MongoDB at default port 27017.
 mongoose.connect(
-  "mongodb+srv://admin-seek:Mockey0821@cluster0.q6tuw.mongodb.net/todolistDB",
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.q6tuw.mongodb.net/todolistDB`,
   {
     useFindAndModify: false,
     useUnifiedTopology: true,
@@ -30,47 +33,12 @@ mongoose.connect(
   }
 );
 
-// CREATING SCHEMA FOR DEFAULT ITEMS//
-const itemsSchema = new mongoose.Schema({
-  name: {
-    type: String,
-  },
-});
-
 // CREATING MODEL / COLLLECTION FOR DEFAULT ITEMSS
-const Item = new mongoose.model("item", itemsSchema);
-const doc1 = new Item({
-  name: "Welcome to your to do list!",
-});
 
-const doc2 = new Item({
-  name: "Hit the + button to add new items.",
-});
-
-const doc3 = new Item({
-  name: "<-- Hit this to delete an Item",
-});
-
+const doc1 = new Item({ name: "Welcome to your to do list!" });
+const doc2 = new Item({ name: "Hit the + button to add new items." });
+const doc3 = new Item({ name: "<-- Hit this to delete an Item" });
 const defaultItems = [doc1, doc2, doc3];
-
-// INSERTING DOCUMEMTS IN A COLLECTION //
-// Item.insertMany(defaultItems, (err) => {
-//   if (err) {
-//     console.error(err);
-//   } else {
-//     console.log("inserted successfully");
-//   }
-// });
-
-// DELETING ALL DOCUMENTS IN A COLLECTION //
-// Item.deleteMany({name: "Hit the + button to add new items."}, (err) =>{
-//     if(!err) {
-//         console.log("successfully deleted");
-
-//     } else {
-//         console.log(err);
-//     }
-// });
 
 // Render default items
 app.get("/", function (req, res) {
@@ -85,10 +53,7 @@ app.get("/", function (req, res) {
         }
       });
     } else {
-      res.render("list", {
-        listTitle: "Today",
-        newListItems: docs,
-      });
+      res.render("list", {listTitle: "Today", newListItems: docs,});
     }
   });
 });
@@ -103,7 +68,7 @@ app.post("/", function (req, res) {
     item.save();
     res.redirect("/");
   } else {
-    Lists.findOne({ name: listName }, (err, foundList) => {
+    List.findOne({ name: listName }, (err, foundList) => {
       foundList.items.push(item);
       foundList.save();
       res.redirect("/" + listName);
@@ -123,7 +88,7 @@ app.post("/delete", function (req, res) {
       }
     });
   } else {
-    Lists.findOneAndUpdate(
+    List.findOneAndUpdate(
       { name: listName },
       { $pull: { items: { _id: selectedItem } } },
       (err, foundList) => {
@@ -135,30 +100,18 @@ app.post("/delete", function (req, res) {
   }
 });
 
-// New Schema for list items
-const listsSchema = new mongoose.Schema({
-  name: String,
-  items: [itemsSchema],
-});
-
-// Creating model for List items
-const Lists = mongoose.model("List", listsSchema);
-
 app.get("/:customListName", (req, res) => {
   const customListName = _.capitalize(req.params.customListName);
-  const list = new Lists({ name: customListName, items: defaultItems });
+  const list = new List({ name: customListName, items: defaultItems });
 
-  Lists.findOne({ name: customListName }, (err, foundLists) => {
+  List.findOne({ name: customListName }, (err, foundLists) => {
     if (!err) {
       if (!foundLists) {
         // If not exist
         list.save();
         res.redirect("/" + customListName);
       } else {
-        res.render("list", {
-          listTitle: foundLists.name,
-          newListItems: foundLists.items,
-        });
+        res.render("list", {listTitle: foundLists.name, newListItems: foundLists.items,});
       }
     }
   });
@@ -170,7 +123,7 @@ app.get("/about", function (res, res) {
 
 let port = process.env.PORT;
 if (port == null || port == "") {
-  port = 3000;
+  port = 8000;
 }
 app.listen(port, function () {
   console.log("Server has started successfully");
