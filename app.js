@@ -1,20 +1,20 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
-const _ = require("lodash");
 require("dotenv").config();
-const app = express();
 const Item = require("./models/models");
 const List = require("./models/models");
-
+const _ = require("lodash");
+const app = express();
 app.use(
   express.urlencoded({
     extended: true,
   })
-);
-app.set("view engine", "ejs");
-app.use(express.static("public"));
+  );
+  app.set("view engine", "ejs");
+  app.use(express.static("public"));
 
+  
 // Connect MongoDB at default port 27017.
 mongoose.connect(
   `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.q6tuw.mongodb.net/todolistDB`,
