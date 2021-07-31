@@ -19,7 +19,7 @@ app.use(
   
 // Connect MongoDB at default port 27017.
 mongoose.connect(
-  `mongodb+srv://todoapp:mockey08212002@cluster0.q6tuw.mongodb.net/todolistDB`,
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.q6tuw.mongodb.net/todolistDB`,
   {
     useFindAndModify: false,
     useUnifiedTopology: true,
