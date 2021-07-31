@@ -45,7 +45,7 @@ const defaultItems = [doc1, doc2, doc3];
 // Render default items
 app.get("/", function (req, res) {
   Item.find({}, (err, docs) => {
-    if (docs.length == 0) {
+    if (docs == 0) {
       Item.insertMany(defaultItems, (err) => {
         if (err) {
           console.log(err);
